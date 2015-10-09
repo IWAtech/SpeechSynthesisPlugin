@@ -192,18 +192,23 @@ public class SpeechSynthesis extends CordovaPlugin implements OnInitListener, On
             while (list.hasNext()) {
                 locale = list.next();
                 voice = new JSONObject();
-                if (mTts.isLanguageAvailable(locale) > 0) {
-                    try {
-                        voice.put("voiceURI", "");
-                        voice.put("name", locale.getDisplayLanguage(locale) + " " + locale.getDisplayCountry(locale));
-                        voice.put("lang", locale.getLanguage());
-                        voice.put("localService", true);
-                        voice.put("default", false);
-                    } catch (JSONException e) {
-                        // should never happen
+                try {
+                    if (mTts.isLanguageAvailable(locale) > 0) {
+                        try {
+                            voice.put("voiceURI", "");
+                            voice.put("name", locale.getDisplayLanguage(locale) + " " + locale.getDisplayCountry(locale));
+                            voice.put("lang", locale.getLanguage());
+                            voice.put("localService", true);
+                            voice.put("default", false);
+                        } catch (JSONException e) {
+                            // should never happen
+                        }
+                        voices.put(voice);
                     }
-                    voices.put(voice);
-                }
+                } catch ( Exception e) {
+                    // prevent crashing of app
+                    Log.d("cordova.speech", "Error while initializing voices" + e.getMessage());
+                }    
             }
             PluginResult result = new PluginResult(PluginResult.Status.OK, voices);
             result.setKeepCallback(false);
